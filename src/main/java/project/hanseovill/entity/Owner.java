@@ -1,12 +1,10 @@
-package project.hanseovill.entity.room;
+package project.hanseovill.entity;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import project.hanseovill.entity.room.Room;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.List;
 
 @Entity
@@ -18,18 +16,16 @@ public class Owner {
     @GeneratedValue
     private Long id;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.LAZY)
     private List<Room> room;
 
-    private String OwnerId;
+    private String ownerId;
 
-    private String OwnerPw;
+    private String ownerPw;
 
     private String ownerTel;
 
     private String ownerNickname;
-
-    ;
 
 
 

@@ -1,8 +1,10 @@
-package project.hanseovill.entity.room;
+package project.hanseovill.entity.room.option;
 
 import lombok.Getter;
 
 import javax.persistence.Embeddable;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 
 @Embeddable
 @Getter
@@ -25,5 +27,8 @@ public class Option {
     private String airCondition;
 
     private String etc;
+
+    @Enumerated(EnumType.STRING)
+    private OptionStatus status;
 
 }

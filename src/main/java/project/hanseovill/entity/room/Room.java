@@ -3,6 +3,8 @@ package project.hanseovill.entity.room;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import project.hanseovill.entity.Image;
+import project.hanseovill.entity.Owner;
+import project.hanseovill.entity.room.option.Option;
 
 import javax.persistence.*;
 import java.util.List;
@@ -16,20 +18,17 @@ public class Room {
     @GeneratedValue
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Owner owner;
 
-    private RoomSize roomSize;
+    private RoomSize Size;
 
     private Option option;
 
     private Address address;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.LAZY)
     private List<Image> image;
-
-    @ManyToOne
-    private Owner ownerTel;
 
     private int roomCount;
 
