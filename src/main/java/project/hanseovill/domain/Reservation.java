@@ -1,8 +1,8 @@
-package project.hanseovill.entity;
+package project.hanseovill.domain;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import project.hanseovill.entity.room.ContractTerm;
+import project.hanseovill.domain.room.ContractTerm;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

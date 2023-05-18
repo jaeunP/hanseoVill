@@ -1,10 +1,10 @@
-package project.hanseovill.entity.room;
+package project.hanseovill.domain.room;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import project.hanseovill.entity.Image;
-import project.hanseovill.entity.Owner;
-import project.hanseovill.entity.room.option.Option;
+import project.hanseovill.domain.Image;
+import project.hanseovill.domain.Owner;
+import project.hanseovill.domain.room.option.Option;
 
 import javax.persistence.*;
 import java.util.List;

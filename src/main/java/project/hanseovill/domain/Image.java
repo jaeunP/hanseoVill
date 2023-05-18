@@ -1,4 +1,4 @@
-package project.hanseovill.entity;
+package project.hanseovill.domain;
 
 
 import javax.persistence.Entity;

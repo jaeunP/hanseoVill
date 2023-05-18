@@ -1,8 +1,8 @@
-package project.hanseovill.entity;
+package project.hanseovill.domain;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import project.hanseovill.entity.room.Room;
+import project.hanseovill.domain.room.Room;
 
 import javax.persistence.*;
 import java.util.List;

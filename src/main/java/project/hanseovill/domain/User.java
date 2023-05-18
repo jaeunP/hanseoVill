@@ -1,4 +1,4 @@
-package project.hanseovill.entity;
+package project.hanseovill.domain;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

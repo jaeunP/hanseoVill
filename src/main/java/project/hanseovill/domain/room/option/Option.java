@@ -1,4 +1,4 @@
-package project.hanseovill.entity.room.option;
+package project.hanseovill.domain.room.option;
 
 import lombok.Getter;
 
