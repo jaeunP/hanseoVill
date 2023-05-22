@@ -19,6 +19,8 @@ public class Owner {
     @OneToMany(fetch = FetchType.LAZY)
     private List<Room> room;
 
+    private String ownerName;
+
     private String ownerId;
 
     private String ownerPw;
