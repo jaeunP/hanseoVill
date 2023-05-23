@@ -18,6 +18,8 @@ public class Room {
     @GeneratedValue
     private Long id;
 
+    private String roomName;
+
     @ManyToOne(fetch = FetchType.LAZY)
     private Owner owner;
 
