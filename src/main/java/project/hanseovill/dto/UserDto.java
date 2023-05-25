@@ -1,31 +1,45 @@
 package project.hanseovill.dto;
 
-import com.sun.istack.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
 
-import project.hanseovill.domain.authority.UserAuthority;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.*;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 @Getter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserDto {
-    private Long id;
-    private String userName;
-    private String userId;
-    private String userPw;
-    private String userTel;
-    private String userNickname;
-    private UserAuthority authority;
 
-    @Builder
-    public UserDto(Long id, String userName, String userId, String userPw, String userTel, String userNickname, UserAuthority authority) {
-        this.id = id;
-        this.userName = userName;
-        this.userId = userId;
-        this.userPw = userPw;
-        this.userTel = userTel;
-        this.userNickname = userNickname;
-        this.authority = authority;
-    }
+    @NotNull
+    @Size(min = 3, max = 50)
+    private String username;
+
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @NotNull
+    @Size(min = 3, max = 100)
+    private String password;
+
+    @NotNull
+    @Size(min = 3, max = 50)
+    private String nickName;
+
+    @NotNull
+    private String userTel;
 
 }
+
+//    @Builder
+//    public UserDto(Long id, String userName, String userId, String userPw, String userTel, String userNickname, Authority authority) {
+//        this.id = id;
+//        this.userName = userName;
+//        this.userId = userId;
+//        this.userPw = userPw;
+//        this.userTel = userTel;
+//        this.userNickname = userNickname;
+//        this.authority = authority;
+//    }
+
+

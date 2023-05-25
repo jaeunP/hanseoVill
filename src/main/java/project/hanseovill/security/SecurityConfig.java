@@ -24,6 +24,7 @@ public class SecurityConfig {
         this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
         this.jwtAccessDeniedHandler = jwtAccessDeniedHandler;
     }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -33,11 +34,13 @@ public class SecurityConfig {
     public WebSecurityCustomizer webSecurityCustomizer(){
         return (web) -> web
                 .ignoring()
-                .antMatchers("/h2-console/**");
+                .antMatchers(
+                        "/h2-console/**"
+                        ,"/favicon,ico");
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
+    public SecurityFilterChain FilterChain(HttpSecurity httpSecurity) throws Exception{
         httpSecurity
                 .csrf().disable()
 
@@ -58,10 +61,10 @@ public class SecurityConfig {
 
 
                 .and()
-                .authorizeHttpRequests()
-                .antMatchers("/api/signup").permitAll()
+                .authorizeRequests()
                 .antMatchers("/api/hello").permitAll()
                 .antMatchers("/api/authenticate").permitAll()
+                .antMatchers("/api/signup").permitAll()
                 .anyRequest().authenticated()
 
                 .and()

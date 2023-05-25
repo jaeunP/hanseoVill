@@ -1,44 +1,56 @@
 package project.hanseovill.domain;
 
-import com.sun.istack.NotNull;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 import project.hanseovill.domain.authority.UserAuthority;
 
 
 import javax.persistence.*;
 
+import java.util.Set;
+
+
 @Entity
+@Table(name = "user")
 @Getter
-@Setter
-@RequiredArgsConstructor
+@NoArgsConstructor
 public class User {
 
+    @JsonIgnore
     @Id
-    @GeneratedValue
-    private Long id;
+    @Column(name = "user_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long userId;
 
-    @NotNull
-    @Column(length = 20)
-    private String userName;
+    @Column(name = "username", length = 50, unique = true)
+    private String username;
 
-    @NotNull
-    @Column(length = 15)
-    private String userId;
+    @JsonIgnore
+    @Column(name = "password", length = 100)
+    private String password;
 
-    @NotNull
-    private String userPw;
+    @Column(name = "nickname", length = 50)
+    private String nickname;
 
-    @NotNull
-    @Column(length = 11)
+    @Column(name = "usertel",length = 11)
     private String userTel;
 
-    @NotNull
-    @Column(length = 7)
-    private String userNickname;
+    @JsonIgnore
+    @Column(name = "activated")
+    private boolean activated;
 
-    @Enumerated(EnumType.STRING)
-    private UserAuthority authority;
+    @JsonIgnore
+    @OneToMany(mappedBy = "authorityName")
+    private Set<UserAuthority> authorities;
 
+    @Builder
+    public User(Long userId, String username, String password, String nickname, String userTel, boolean activated, Set<UserAuthority> authorities) {
+        this.userId = userId;
+        this.username = username;
+        this.password = password;
+        this.nickname = nickname;
+        this.userTel = userTel;
+        this.activated = activated;
+        this.authorities = authorities;
+    }
 }

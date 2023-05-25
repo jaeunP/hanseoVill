@@ -7,14 +7,14 @@ import lombok.*;
 public class LoginDto {
 
     @NotNull
-    private String userId;
+    private String username;
 
     @NotNull
     private String password;
 
     @Builder
-    public LoginDto(String userId, String password) {
-        this.userId = userId;
+    public LoginDto(String username, String password) {
+        this.username = username;
         this.password = password;
     }
 }

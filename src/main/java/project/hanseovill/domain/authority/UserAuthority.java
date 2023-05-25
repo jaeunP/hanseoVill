@@ -1,16 +1,23 @@
 package project.hanseovill.domain.authority;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import project.hanseovill.domain.User;
+
+import javax.persistence.*;
+import java.io.Serializable;
 
 
 @Getter
-@RequiredArgsConstructor
-public enum UserAuthority {
+@Entity
+public class UserAuthority implements Serializable {
 
-    USER("ROLE_USER", "사용자"),
-    ADMIN("ROLE_ADMIN", "관리자");
+    @Id
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User userId;
 
-    private final String key;
-    private final String title;
+    @Id
+    @ManyToOne
+    @JoinColumn(name = "authority_name")
+    private Authority authorityName;
 }
