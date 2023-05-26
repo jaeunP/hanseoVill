@@ -8,9 +8,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Getter
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserDto {
 
     @NotNull
@@ -24,22 +22,23 @@ public class UserDto {
 
     @NotNull
     @Size(min = 3, max = 50)
-    private String nickName;
+    private String nickname;
 
     @NotNull
     private String userTel;
 
+    private String authority;
+
+    @Builder
+    public UserDto(String username, String password, String nickname, String userTel, String authority) {
+        this.username = username;
+        this.password = password;
+        this.nickname = nickname;
+        this.userTel = userTel;
+        this.authority = authority;
+    }
 }
 
-//    @Builder
-//    public UserDto(Long id, String userName, String userId, String userPw, String userTel, String userNickname, Authority authority) {
-//        this.id = id;
-//        this.userName = userName;
-//        this.userId = userId;
-//        this.userPw = userPw;
-//        this.userTel = userTel;
-//        this.userNickname = userNickname;
-//        this.authority = authority;
-//    }
+
 
 

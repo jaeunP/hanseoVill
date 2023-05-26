@@ -1,4 +1,4 @@
-package project.hanseovill.security;
+package project.hanseovill.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,6 +9,10 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import project.hanseovill.security.JwtAccessDeniedHandler;
+import project.hanseovill.security.JwtAuthenticationEntryPoint;
+import project.hanseovill.security.JwtSecurityConfig;
+import project.hanseovill.security.TokenProvider;
 
 @Configuration
 @EnableWebSecurity
