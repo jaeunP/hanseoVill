@@ -1,9 +1,11 @@
-package project.hanseovill.security;
+package project.hanseovill.config;
 
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import project.hanseovill.security.JwtFilter;
+import project.hanseovill.security.TokenProvider;
 
 public class JwtSecurityConfig extends SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity> {
 
@@ -13,7 +15,6 @@ public class JwtSecurityConfig extends SecurityConfigurerAdapter<DefaultSecurity
         this.tokenProvider = tokenProvider;
     }
 
-    // jwt 필터 등록
     @Override
     public void configure(HttpSecurity http) {
         JwtFilter customFilter = new JwtFilter(tokenProvider);

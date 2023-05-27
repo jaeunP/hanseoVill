@@ -8,7 +8,10 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserDto {
 
     @NotNull
@@ -23,22 +26,7 @@ public class UserDto {
     @NotNull
     @Size(min = 3, max = 50)
     private String nickname;
-
-    @NotNull
-    private String userTel;
-
-    private String authority;
-
-    @Builder
-    public UserDto(String username, String password, String nickname, String userTel, String authority) {
-        this.username = username;
-        this.password = password;
-        this.nickname = nickname;
-        this.userTel = userTel;
-        this.authority = authority;
-    }
 }
-
 
 
 

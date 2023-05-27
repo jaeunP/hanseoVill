@@ -50,14 +50,18 @@ public class TokenProvider implements InitializingBean {
 
     // Authentication 객체의 권한정보를 이용해서 토큰을 생성
     public String createToken(Authentication authentication) {
+
+//        권한
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
 
         long now = (new Date()).getTime();
+
+//        application.yml에서 설정했던 만료시간 설정
         Date validity = new Date(now + this.tokenValidityInMilliseconds);
 
-        // jwt 토큰 생성
+//        jwt토큰 생성
         return Jwts.builder()
                 .setSubject(authentication.getName())
                 .claim(AUTHORITIES_KEY, authorities)
@@ -66,8 +70,10 @@ public class TokenProvider implements InitializingBean {
                 .compact();
     }
 
+
     // 토큰을 이용해 Authentication 객체를 리턴
     public Authentication getAuthentication(String token) {
+//        토큰을 파라미터로 받음
         Claims claims = Jwts
                 .parserBuilder()
                 .setSigningKey(key)
@@ -75,13 +81,15 @@ public class TokenProvider implements InitializingBean {
                 .parseClaimsJws(token)
                 .getBody();
 
+//        권한정보들을 추출
         Collection<? extends GrantedAuthority> authorities =
                 Arrays.stream(claims.get(AUTHORITIES_KEY).toString().split(","))
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
 
+//        권한정보를 이용해서 유저객체 생성
         User principal = new User(claims.getSubject(), "", authorities);
-
+//        user객체와 토큰, 권한정보를 이용하여 최종적으로 Authentication 객체를 리턴
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);
     }
 
