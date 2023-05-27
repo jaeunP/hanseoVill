@@ -2,7 +2,7 @@ package project.hanseovill.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
-import project.hanseovill.domain.authority.UserAuthority;
+import project.hanseovill.domain.authority.Authority;
 
 
 import javax.persistence.*;
@@ -13,6 +13,9 @@ import java.util.Set;
 @Entity
 @Table(name = "user")
 @Getter
+@Setter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 public class User {
 
@@ -32,25 +35,14 @@ public class User {
     @Column(name = "nickname", length = 50)
     private String nickname;
 
-    @Column(name = "usertel",length = 11)
-    private String userTel;
-
     @JsonIgnore
     @Column(name = "activated")
     private boolean activated;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "authorityName")
-    private Set<UserAuthority> authorities;
-
-    @Builder
-    public User(Long userId, String username, String password, String nickname, String userTel, boolean activated, Set<UserAuthority> authorities) {
-        this.userId = userId;
-        this.username = username;
-        this.password = password;
-        this.nickname = nickname;
-        this.userTel = userTel;
-        this.activated = activated;
-        this.authorities = authorities;
-    }
+    @ManyToMany
+    @JoinTable(
+            name = "user_authority",
+            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "user_id")},
+            inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "authority_name")})
+    private Set<Authority> authorities;
 }
