@@ -3,7 +3,7 @@ package project.hanseovill.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import project.hanseovill.domain.authority.Authority;
-
+import project.hanseovill.domain.authority.UserAuthority;
 
 import javax.persistence.*;
 
@@ -39,10 +39,8 @@ public class User {
     @Column(name = "activated")
     private boolean activated;
 
-    @ManyToMany
-    @JoinTable(
-            name = "user_authority",
-            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "user_id")},
-            inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "authority_name")})
+    @OneToMany
+    @Column(name = "authorities")
     private Set<Authority> authorities;
+
 }

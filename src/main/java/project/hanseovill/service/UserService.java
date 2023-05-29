@@ -1,25 +1,18 @@
 package project.hanseovill.service;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import project.hanseovill.domain.User;
 import project.hanseovill.domain.authority.Authority;
+import project.hanseovill.domain.authority.UserAuthority;
 import project.hanseovill.dto.UserDto;
 import project.hanseovill.repository.UserRepository;
 import project.hanseovill.security.SecurityUtil;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -39,26 +32,44 @@ public class UserService {
      */
     @Transactional
     public User signup(UserDto userDto) {
-        if (userRepository.findOneWithAuthoritiesByUsername(userDto.getUsername()).orElse(null) != null) {
-            throw new RuntimeException("이미 가입되어 있는 유저입니다.");
-        }
+        return signupUser(userDto);
+    }
+
+    @Transactional
+    public User signupAdmin(UserDto userDto) {
+        return signupUser(userDto);
+    }
+
+    private User signupUser(UserDto userDto) {
+        validationUser(userDto);
 
         Authority authority = Authority.builder()
                 .authorityName("ROLE_USER")
                 .build();
 
-
+        Authority admin = Authority.builder()
+                .authorityName("ROLE_ADMIN")
+                .build();
 
         User user = User.builder()
                 .username(userDto.getUsername())
                 .password(passwordEncoder.encode(userDto.getPassword()))
                 .nickname(userDto.getNickname())
                 .authorities(Collections.singleton(authority))
+                .authorities(Collections.singleton(admin))
                 .activated(true)
                 .build();
 
         return userRepository.save(user);
     }
+
+    private void validationUser(UserDto userDto) {
+        if (userRepository.findOneWithAuthoritiesByUsername(userDto.getUsername()).orElse(null) != null) {
+            throw new RuntimeException("이미 가입되어 있는 유저입니다.");
+        }
+    }
+
+
     /**
      * username을 기준으로 권한정보를 가져옴
      */
