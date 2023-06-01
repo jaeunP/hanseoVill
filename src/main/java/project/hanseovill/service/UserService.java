@@ -47,8 +47,8 @@ public class UserService {
                 .authorityName("ROLE_USER")
                 .build();
 
-        Authority admin = Authority.builder()
-                .authorityName("ROLE_ADMIN")
+        UserAuthority userAuthority = UserAuthority.builder()
+                .authorityName(authority)
                 .build();
 
         User user = User.builder()
@@ -56,7 +56,6 @@ public class UserService {
                 .password(passwordEncoder.encode(userDto.getPassword()))
                 .nickname(userDto.getNickname())
                 .authorities(Collections.singleton(authority))
-                .authorities(Collections.singleton(admin))
                 .activated(true)
                 .build();
 

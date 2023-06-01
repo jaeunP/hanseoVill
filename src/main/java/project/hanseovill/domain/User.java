@@ -40,7 +40,7 @@ public class User {
     private boolean activated;
 
     @OneToMany
-    @Column(name = "authorities")
+    @JoinColumn
     private Set<Authority> authorities;
 
 }
