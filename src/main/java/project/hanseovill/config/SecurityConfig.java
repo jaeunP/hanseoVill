@@ -2,40 +2,48 @@ package project.hanseovill.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.SecurityFilterChain;
+
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import project.hanseovill.security.JwtAccessDeniedHandler;
 import project.hanseovill.security.JwtAuthenticationEntryPoint;
-import project.hanseovill.security.TokenProvider;
+import project.hanseovill.security.JwtAuthenticationFilter;
 
+
+@Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)  //@PreAuthorize 어노테이션을 메서드 단위로 추가하기 위해서 적용
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-    private final TokenProvider tokenProvider;
+
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+    private final JwtAuthenticationFilter jwtRequestFilter;
 
-    public SecurityConfig(
-            TokenProvider tokenProvider,
-            JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
-            JwtAccessDeniedHandler jwtAccessDeniedHandler
-    ) {
-        this.tokenProvider = tokenProvider;
+    public SecurityConfig(JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
+                          JwtAccessDeniedHandler jwtAccessDeniedHandler,
+                          JwtAuthenticationFilter jwtRequestFilter) {
         this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
         this.jwtAccessDeniedHandler = jwtAccessDeniedHandler;
+        this.jwtRequestFilter = jwtRequestFilter;
+    }
+
+
+    @Bean
+    public BCryptPasswordEncoder encodePassword() {
+        return new BCryptPasswordEncoder();
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
     }
 
     @Override
@@ -47,15 +55,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                /** 서버에 인증정보를 저장하지 않아서 불필요 (rest api 서버)*/
                 .csrf().disable()
 
-                /** 오류제어(401 Error, 403 Error)*/
+                // 오류제어(401 Error, 403 Error)
                 .exceptionHandling()
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 .accessDeniedHandler(jwtAccessDeniedHandler)
 
-                /** h2-console을 위한 설정 추가*/
+                // h2-console을 위한 설정 추가
                 .and()
                 .headers()
                 .frameOptions()
@@ -67,15 +74,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS) //세션을 사용하지 않기에 세션 설정은 STATELESS
 
                 .and()
-                .authorizeRequests()    //HttpServletRequest를 사용하는 요청들에 대한 접근제한을 설정
-                .antMatchers("/api/hello").permitAll()  //URL에 대한 요청은 인증없이 접근 허용
-                .antMatchers("/api/authenticate").permitAll()
+                .authorizeRequests()
+                .antMatchers("/user/**").permitAll()
+                .antMatchers("/api/login").permitAll()
                 .antMatchers("/api/signup").permitAll()
-                .anyRequest().authenticated()   //나머지 요청들은 모두 인증 요구
+                .anyRequest().authenticated();
 
-                /** JwtFilter 를 addFilterBefore 로 등록했던 JwtSecurityConfig 클래스 적용*/
-                .and()
-                .apply(new JwtSecurityConfig(tokenProvider));
+        http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+
     }
 
 

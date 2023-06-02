@@ -2,12 +2,10 @@ package project.hanseovill.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
-import project.hanseovill.domain.authority.Authority;
-import project.hanseovill.domain.authority.UserAuthority;
 
 import javax.persistence.*;
 
-import java.util.Set;
+
 
 
 @Entity
@@ -34,11 +32,7 @@ public class User {
     @Column(name = "nickname", length = 50)
     private String nickname;
 
-    @JsonIgnore
-    @Column(name = "activated")
-    private boolean activated;
-
-    @OneToMany(mappedBy = "user")
-    private Set<UserAuthority> authorities;
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
 }

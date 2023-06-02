@@ -2,11 +2,10 @@ package project.hanseovill.dto;
 
 import lombok.*;
 
+@RequiredArgsConstructor
 @Getter
-@Setter
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
 public class TokenDto {
-    private String token;
+    private final String token;
+    private final String username;
+
 }

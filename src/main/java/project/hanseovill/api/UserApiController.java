@@ -1,47 +1,43 @@
 package project.hanseovill.api;
 
+
 import lombok.RequiredArgsConstructor;
-
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-
 import project.hanseovill.domain.User;
+import project.hanseovill.dto.LoginDto;
+import project.hanseovill.dto.TokenDto;
 import project.hanseovill.dto.UserDto;
+
 import project.hanseovill.service.UserService;
 
-import javax.validation.Valid;
 
-
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api")
 public class UserApiController {
     private final UserService userService;
 
-    public UserApiController(UserService userService) {
-        this.userService = userService;
+    @GetMapping("/findUser/{username}")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    public ResponseEntity<UserDto> findUser(@PathVariable String username) {
+        return ResponseEntity.ok(userService.findUser(username));
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<User> signup(@Valid @RequestBody UserDto userDto) {
-        return ResponseEntity.ok(userService.signup(userDto));
+    public ResponseEntity<User> createUser(@RequestBody UserDto userDto) throws Exception {
+        return ResponseEntity.ok(userService.signupUser(userDto));
     }
 
-    /**
-     * @Preauthoirze를 통해서 User, ADMIN 두가지 권한 모두 허용
-     */
-    @GetMapping("/user")
-    @PreAuthorize("hasAnyRole('USER','ADMIN')")
-    public ResponseEntity<User> getMyUserInfo() {
-        return ResponseEntity.ok(userService.getMyUserWithAuthorities().get());
+    @PostMapping("/login")
+    public ResponseEntity<TokenDto> createAuthenticationToken(@RequestBody LoginDto userDto) throws Exception {
+        return ResponseEntity.ok(userService.login(userDto));
     }
 
-    /** ADMIN 권한만 호출할수 있도록 설정  */
-    @GetMapping("/user/{username}")
-    @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<User> getUserInfo(@PathVariable String username) {
-        return ResponseEntity.ok(userService.getUserWithAuthorities(username).get());
-    }
+
+
+
+
 }

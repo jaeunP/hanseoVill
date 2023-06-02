@@ -1,87 +1,83 @@
 package project.hanseovill.service;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.transaction.annotation.Transactional;
+import project.hanseovill.domain.Role;
 import project.hanseovill.domain.User;
-import project.hanseovill.domain.authority.Authority;
-import project.hanseovill.domain.authority.UserAuthority;
+import project.hanseovill.dto.LoginDto;
+import project.hanseovill.dto.TokenDto;
 import project.hanseovill.dto.UserDto;
 import project.hanseovill.repository.UserRepository;
-import project.hanseovill.security.SecurityUtil;
+import project.hanseovill.security.JwtTokenUtil;
 
-import java.util.Collections;
+
 import java.util.Optional;
 
-
+@RequiredArgsConstructor
 @Service
 public class UserService {
+    private final AuthenticationManager authenticationManager;
+    private final UserDetailsService userDetailsService;
+    private final JwtTokenUtil jwtTokenUtil;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
+    @Transactional
+    public TokenDto login(LoginDto userDto) throws Exception {
+        return createToken(userDto.getUsername(), userDto.getPassword());
     }
 
-    /**
-     * 회원가입 로직을 수행하는 메서드
-     * username이 DB에 존재하지 않으면 Authority와 User 정보를 생성해서
-     * UserRepository의 save를 통해 DB에 정보를 저장
-     */
-
-//    public User findAuthority(User username) {
-//
-//    }
-
     @Transactional
-    public User signup(UserDto userDto) {
-        validationUser(userDto);
+    public User signupUser(UserDto userDto) throws Exception {
 
-        Authority authority = Authority.builder()
-                .authorityName("ROLE_USER")
-                .build();
+        Role role = Role.ROLE_USER;
 
-        UserAuthority userAuthority = UserAuthority.builder()
-                .authority(authority)
-                .build();
-
-        if(userAuthority.getAuthority() == null){
-            throw new RuntimeException("권한정보가 없습니다");
-        }
         User user = User.builder()
                 .username(userDto.getUsername())
                 .password(passwordEncoder.encode(userDto.getPassword()))
                 .nickname(userDto.getNickname())
-                .authorities(Collections.singleton(userAuthority))
-                .activated(true)
+                .role(role)
                 .build();
+        userRepository.save(user);
 
-        return userRepository.save(user);
+        createToken(userDto.getUsername(), userDto.getPassword());
+        return user;
     }
 
-    private void validationUser(UserDto userDto) {
-        if (userRepository.findOneWithAuthoritiesByUsername(userDto.getUsername()).orElse(null) != null) {
-            throw new RuntimeException("이미 가입되어 있는 유저입니다.");
+    public UserDto findUser(String username) {
+        Optional<User> findUser = userRepository.findByUsername(username);
+
+        return UserDto.builder()
+                .username(findUser.get().getUsername())
+                .nickname(findUser.get().getNickname())
+                .role(findUser.get().getRole())
+                .build();
+    }
+
+    private void authenticate(String username, String password) throws Exception {
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+        } catch (DisabledException e) {//   인증 거부 - 계정 비활성화
+            throw new Exception("계정이 비활성화 상태입니다.", e);
+        } catch (BadCredentialsException e) {//  비밀번호가 일치하지 않을 때 던지는 예외
+            throw new Exception("사용자 계정이 불일치 합니다.", e);
         }
     }
 
-
-    /**
-     * username을 기준으로 권한정보를 가져옴
-     */
-    @Transactional(readOnly = true)
-    public Optional<User> getUserWithAuthorities(String username) {
-        return userRepository.findOneWithAuthoritiesByUsername(username);
+    private TokenDto createToken(String username, String password) throws Exception {
+        authenticate(username, password);
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        String token = jwtTokenUtil.generateToken(userDetails);
+        return new TokenDto(token, userDetails.getUsername());
     }
 
-
-    /**
-     * SecurityContext에 저장된 username의 권한 정보만 가져옴
-     */
-    @Transactional(readOnly = true)
-    public Optional<User> getMyUserWithAuthorities() {
-        return SecurityUtil.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUsername);
-    }
 }
