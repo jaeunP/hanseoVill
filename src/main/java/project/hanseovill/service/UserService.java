@@ -30,17 +30,13 @@ public class UserService {
      * username이 DB에 존재하지 않으면 Authority와 User 정보를 생성해서
      * UserRepository의 save를 통해 DB에 정보를 저장
      */
+
+//    public User findAuthority(User username) {
+//
+//    }
+
     @Transactional
     public User signup(UserDto userDto) {
-        return signupUser(userDto);
-    }
-
-    @Transactional
-    public User signupAdmin(UserDto userDto) {
-        return signupUser(userDto);
-    }
-
-    private User signupUser(UserDto userDto) {
         validationUser(userDto);
 
         Authority authority = Authority.builder()
@@ -48,14 +44,17 @@ public class UserService {
                 .build();
 
         UserAuthority userAuthority = UserAuthority.builder()
-                .authorityName(authority)
+                .authority(authority)
                 .build();
 
+        if(userAuthority.getAuthority() == null){
+            throw new RuntimeException("권한정보가 없습니다");
+        }
         User user = User.builder()
                 .username(userDto.getUsername())
                 .password(passwordEncoder.encode(userDto.getPassword()))
                 .nickname(userDto.getNickname())
-                .authorities(Collections.singleton(authority))
+                .authorities(Collections.singleton(userAuthority))
                 .activated(true)
                 .build();
 

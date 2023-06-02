@@ -19,7 +19,6 @@ import java.util.Set;
 @NoArgsConstructor
 public class User {
 
-    @JsonIgnore
     @Id
     @Column(name = "user_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,8 +38,7 @@ public class User {
     @Column(name = "activated")
     private boolean activated;
 
-    @OneToMany
-    @JoinColumn
-    private Set<Authority> authorities;
+    @OneToMany(mappedBy = "user")
+    private Set<UserAuthority> authorities;
 
 }

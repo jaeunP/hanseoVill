@@ -17,17 +17,17 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "user_authority")
-public class UserAuthority implements Serializable {
+public class UserAuthority implements Serializable{
 
     @Id
-    @JsonIgnore
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "user_id")
-    private User userId;
+    private User user;
 
     @Id
     @ManyToOne
     @JoinColumn(name = "authority_name")
-    private Authority authorityName;
+    private Authority authority;
 
 }
