@@ -19,7 +19,7 @@ import project.hanseovill.security.JwtAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)  //@PreAuthorize 어노테이션을 메서드 단위로 추가하기 위해서 적용
+@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
@@ -75,7 +75,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .and()
                 .authorizeRequests()
-                .antMatchers("/user/**").permitAll()
                 .antMatchers("/api/login").permitAll()
                 .antMatchers("/api/signup").permitAll()
                 .anyRequest().authenticated();

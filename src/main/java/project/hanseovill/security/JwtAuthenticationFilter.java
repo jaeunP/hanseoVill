@@ -1,7 +1,6 @@
 package project.hanseovill.security;
 
 import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.SignatureException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -30,8 +29,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     String TOKEN_PREFIX = "Bearer ";
 
     @Override
-    protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
-        String header = req.getHeader(HEADER_STRING);
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
+        String header = request.getHeader(HEADER_STRING);
         String username = null;
         String authToken = null;
         if (header != null && header.startsWith(TOKEN_PREFIX)) {
@@ -39,14 +38,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             try {
                 username = jwtTokenUtil.getUsernameFromToken(authToken);
             } catch (IllegalArgumentException e) {
-                logger.error("an error occured during getting username from token", e);
+                logger.error("토큰에서 사용자 이름을 가져오는 동안 오류가 발생했습니다.", e);
             } catch (ExpiredJwtException e) {
-                logger.warn("the token is expired and not valid anymore", e);
-            } catch(SignatureException e){
-                logger.error("Authentication Failed. Username or Password not valid.");
+                logger.warn("토큰이 만료되어 더 이상 유효하지 않습니다.", e);
             }
         } else {
-            logger.warn("couldn't find bearer string, will ignore the header");
+            logger.warn("Bearer 문자열을 찾을수 없어서 헤더를 무시합니다.");
         }
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
@@ -54,12 +51,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             if (jwtTokenUtil.validateToken(authToken, userDetails)) {
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, Arrays.asList(new SimpleGrantedAuthority("ROLE_ADMIN")));
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(req));
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 logger.info("authenticated user " + username + ", setting security context");
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }
 
-        chain.doFilter(req, res);
+        chain.doFilter(request, res);
     }
+
+
+
 }

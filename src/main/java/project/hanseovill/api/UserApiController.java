@@ -3,7 +3,7 @@ package project.hanseovill.api;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import project.hanseovill.domain.User;
@@ -13,6 +13,8 @@ import project.hanseovill.dto.UserDto;
 
 import project.hanseovill.service.UserService;
 
+import java.security.Principal;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @RestController
@@ -21,10 +23,17 @@ public class UserApiController {
     private final UserService userService;
 
     @GetMapping("/findUser/{username}")
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    @Secured("ROLE_ADMIN")
     public ResponseEntity<UserDto> findUser(@PathVariable String username) {
         return ResponseEntity.ok(userService.findUser(username));
     }
+
+    @GetMapping("/myInfo")
+    @ResponseBody
+    public ResponseEntity<Optional<User>> myInfo(Principal principal){
+        return ResponseEntity.ok(userService.userInfo(principal));
+    }
+
 
     @PostMapping("/signup")
     public ResponseEntity<User> createUser(@RequestBody UserDto userDto) throws Exception {

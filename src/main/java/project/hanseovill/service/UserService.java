@@ -20,6 +20,7 @@ import project.hanseovill.repository.UserRepository;
 import project.hanseovill.security.JwtTokenUtil;
 
 
+import java.security.Principal;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -31,9 +32,24 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    public Optional<User> userInfo(Principal principal) {
+        String username = principal.getName();
+        return userRepository.findByUsername(username);
+    }
+
     @Transactional
-    public TokenDto login(LoginDto userDto) throws Exception {
-        return createToken(userDto.getUsername(), userDto.getPassword());
+    public TokenDto login(LoginDto loginDto) throws Exception {
+        String username = loginDto.getUsername();
+        String password = loginDto.getPassword();
+
+        Optional<User> byUsername = userRepository.findByUsername(username);
+
+        if (passwordEncoder.matches(password, byUsername.get().getPassword())){
+            return createToken(username, password);
+        } else {
+            throw new Exception("아이디 또는 비밀번호가 일치하지 않습니다");
+
+        }
     }
 
     @Transactional
@@ -50,6 +66,7 @@ public class UserService {
         userRepository.save(user);
 
         createToken(userDto.getUsername(), userDto.getPassword());
+
         return user;
     }
 
@@ -63,6 +80,13 @@ public class UserService {
                 .build();
     }
 
+    private TokenDto createToken(String username, String password) throws Exception {
+        authenticate(username, password);
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        String token = jwtTokenUtil.generateToken(userDetails);
+        return new TokenDto(token, userDetails.getUsername());
+    }
+
     private void authenticate(String username, String password) throws Exception {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
@@ -73,11 +97,6 @@ public class UserService {
         }
     }
 
-    private TokenDto createToken(String username, String password) throws Exception {
-        authenticate(username, password);
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-        String token = jwtTokenUtil.generateToken(userDetails);
-        return new TokenDto(token, userDetails.getUsername());
-    }
+
 
 }
