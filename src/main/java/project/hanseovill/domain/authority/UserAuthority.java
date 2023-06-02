@@ -19,7 +19,6 @@ import java.io.Serializable;
 @Table(name = "user_authority")
 public class UserAuthority implements Serializable{
 
-    @Id
     @ManyToOne
     @JsonIgnore
     @JoinColumn(name = "user_id")
