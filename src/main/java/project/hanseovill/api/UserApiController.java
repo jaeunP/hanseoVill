@@ -22,6 +22,8 @@ import java.util.Optional;
 public class UserApiController {
     private final UserService userService;
 
+
+
     @GetMapping("/findUser/{username}")
     @Secured("ROLE_ADMIN")
     public ResponseEntity<UserDto> findUser(@PathVariable String username) {
@@ -29,7 +31,7 @@ public class UserApiController {
     }
 
     @GetMapping("/myInfo")
-    @ResponseBody
+    @Secured({"ROLE_USER","ROLE_ADMIN"})
     public ResponseEntity<Optional<User>> myInfo(Principal principal){
         return ResponseEntity.ok(userService.userInfo(principal));
     }
