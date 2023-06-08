@@ -20,7 +20,7 @@ public class Reservation {
     private Long id;
 
     @ManyToOne
-    private Member member;
+    private User user;
 
     @ManyToOne
     private Owner owner;

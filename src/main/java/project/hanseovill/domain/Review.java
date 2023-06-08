@@ -18,7 +18,7 @@ public class Review {
     private Long id;
 
     @ManyToOne
-    private Member member;
+    private User user;
 
     @ManyToOne
     private Room room;

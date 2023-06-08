@@ -11,20 +11,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import org.springframework.transaction.annotation.Transactional;
-import project.hanseovill.domain.Owner;
 import project.hanseovill.domain.Role;
-import project.hanseovill.domain.Member;
+import project.hanseovill.domain.User;
 import project.hanseovill.dto.LoginDto;
-import project.hanseovill.dto.OwnerDto;
 import project.hanseovill.dto.TokenDto;
-import project.hanseovill.dto.MemberDto;
-import project.hanseovill.repository.OwnerRepository;
-import project.hanseovill.repository.MemberRepository;
+import project.hanseovill.dto.UserDto;
+import project.hanseovill.repository.UserRepository;
 import project.hanseovill.security.JwtTokenUtil;
 
 
 import java.security.Principal;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -33,58 +29,12 @@ public class UserService {
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
     private final JwtTokenUtil jwtTokenUtil;
-    private final MemberRepository memberRepository;
-    private final OwnerRepository ownerRepository;
+    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public MemberDto userInfo(Principal principal) {
+    public Optional<User> userInfo(Principal principal) {
         String username = principal.getName();
-        Member member = memberRepository.findByUsername(username)
-                .orElseThrow(() -> new NoSuchElementException("유저가 존재하지 않습니다"));
-
-        MemberDto memberDto = MemberDto.builder()
-                .username(member.getUsername())
-                .nickname(member.getNickname())
-                .tel(member.getTel())
-                .build();
-
-        return memberDto;
-    }
-
-    @Transactional
-    public String signupUser(MemberDto memberDto) throws Exception {
-
-        Role role = Role.ROLE_USER;
-
-        Member member = Member.builder()
-                .username(memberDto.getUsername())
-                .password(passwordEncoder.encode(memberDto.getPassword()))
-                .nickname(memberDto.getNickname())
-                .tel(memberDto.getTel())
-                .role(role)
-                .build();
-
-        memberRepository.save(member);
-
-        return member.getUsername();
-    }
-
-    @Transactional
-    public String signupOwner(OwnerDto ownerDto) {
-
-        Role role = Role.ROLE_OWNER;
-
-        Owner owner = Owner.builder()
-                .username(ownerDto.getUsername())
-                .password(passwordEncoder.encode(ownerDto.getPassword()))
-                .nickname(ownerDto.getNickname())
-                .tel(ownerDto.getTel())
-                .role(role)
-                .build();
-
-        ownerRepository.save(owner);
-
-        return owner.getUsername();
+        return userRepository.findByUsername(username);
     }
 
     @Transactional
@@ -92,9 +42,9 @@ public class UserService {
         String username = loginDto.getUsername();
         String password = loginDto.getPassword();
 
-        String userPassword = memberRepository.findByUsername(username).get().getPassword();
+        Optional<User> byUsername = userRepository.findByUsername(username);
 
-        if (passwordEncoder.matches(password, userPassword)){
+        if (passwordEncoder.matches(password, byUsername.get().getPassword())){
             return createToken(username, password);
         } else {
             throw new Exception("아이디 또는 비밀번호가 일치하지 않습니다");
@@ -102,12 +52,28 @@ public class UserService {
         }
     }
 
+    @Transactional
+    public User signupUser(UserDto userDto) throws Exception {
 
+        Role role = Role.ROLE_USER;
 
-    public MemberDto findUser(String username) {
-        Optional<Member> findUser = memberRepository.findByUsername(username);
+        User user = User.builder()
+                .username(userDto.getUsername())
+                .password(passwordEncoder.encode(userDto.getPassword()))
+                .nickname(userDto.getNickname())
+                .role(role)
+                .build();
+        userRepository.save(user);
 
-        return MemberDto.builder()
+        createToken(userDto.getUsername(), userDto.getPassword());
+
+        return user;
+    }
+
+    public UserDto findUser(String username) {
+        Optional<User> findUser = userRepository.findByUsername(username);
+
+        return UserDto.builder()
                 .username(findUser.get().getUsername())
                 .nickname(findUser.get().getNickname())
                 .role(findUser.get().getRole())
@@ -118,7 +84,6 @@ public class UserService {
         authenticate(username, password);
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
         String token = jwtTokenUtil.generateToken(userDetails);
-
         return new TokenDto(token, userDetails.getUsername());
     }
 

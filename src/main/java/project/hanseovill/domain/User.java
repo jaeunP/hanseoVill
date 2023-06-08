@@ -9,15 +9,18 @@ import javax.persistence.*;
 
 
 @Entity
-@Table(name = "member")
+@Table(name = "user")
 @Getter
+@Setter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
-public class Member {
+public class User {
 
     @Id
-    @Column(name = "member_id")
+    @Column(name = "user_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long userId;
 
     @Column(name = "username", length = 50, unique = true)
     private String username;
@@ -29,19 +32,7 @@ public class Member {
     @Column(name = "nickname", length = 50)
     private String nickname;
 
-    @Column(name = "tel", length = 50)
-    private String tel;
-
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @Builder
-    public Member(Long id, String username, String password, String nickname, String tel, Role role) {
-        this.id = id;
-        this.username = username;
-        this.password = password;
-        this.nickname = nickname;
-        this.tel = tel;
-        this.role = role;
-    }
 }
