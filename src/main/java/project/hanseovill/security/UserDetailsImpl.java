@@ -5,7 +5,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import project.hanseovill.domain.Role;
-import project.hanseovill.domain.User;
+import project.hanseovill.domain.Member;
 
 import java.util.ArrayList;
 
@@ -15,24 +15,24 @@ import java.util.Collection;
 
 public class UserDetailsImpl implements UserDetails {
 
-    private final User user;
+    private final Member member;
 
-    public UserDetailsImpl(User user) {
-        this.user = user;
+    public UserDetailsImpl(Member member) {
+        this.member = member;
     }
 
-    public User getUser() {
-        return user;
+    public Member getUser() {
+        return member;
     }
 
     @Override
     public String getPassword() {
-        return user.getPassword();
+        return member.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return user.getUsername();
+        return member.getUsername();
     }
 
     @Override
@@ -57,7 +57,7 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        Role userRole = user.getRole();
+        Role userRole = member.getRole();
 
         SimpleGrantedAuthority authority = new SimpleGrantedAuthority(userRole.toString());
         Collection<GrantedAuthority> authorities = new ArrayList<>();

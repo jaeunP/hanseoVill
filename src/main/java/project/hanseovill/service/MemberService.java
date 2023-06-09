@@ -12,11 +12,11 @@ import org.springframework.stereotype.Service;
 
 import org.springframework.transaction.annotation.Transactional;
 import project.hanseovill.domain.Role;
-import project.hanseovill.domain.User;
+import project.hanseovill.domain.Member;
 import project.hanseovill.dto.LoginDto;
 import project.hanseovill.dto.TokenDto;
-import project.hanseovill.dto.UserDto;
-import project.hanseovill.repository.UserRepository;
+import project.hanseovill.dto.MemberDto;
+import project.hanseovill.repository.MemberRepository;
 import project.hanseovill.security.JwtTokenUtil;
 
 
@@ -25,16 +25,25 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
-public class UserService {
+public class MemberService {
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
     private final JwtTokenUtil jwtTokenUtil;
-    private final UserRepository userRepository;
+    private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public Optional<User> userInfo(Principal principal) {
+    public MemberDto myInfo(Principal principal) {
         String username = principal.getName();
-        return userRepository.findByUsername(username);
+        Optional<Member> member = memberRepository.findByUsername(username);
+
+        MemberDto memberDto = MemberDto.builder()
+                .memberId(member.get().getMemberId())
+                .username(member.get().getUsername())
+                .nickname(member.get().getNickname())
+                .tel(member.get().getTel())
+                .build();
+
+        return memberDto;
     }
 
     @Transactional
@@ -42,7 +51,7 @@ public class UserService {
         String username = loginDto.getUsername();
         String password = loginDto.getPassword();
 
-        Optional<User> byUsername = userRepository.findByUsername(username);
+        Optional<Member> byUsername = memberRepository.findByUsername(username);
 
         if (passwordEncoder.matches(password, byUsername.get().getPassword())){
             return createToken(username, password);
@@ -53,29 +62,31 @@ public class UserService {
     }
 
     @Transactional
-    public User signupUser(UserDto userDto) throws Exception {
+    public String signupMember(MemberDto memberDto) throws Exception {
 
         Role role = Role.ROLE_USER;
 
-        User user = User.builder()
-                .username(userDto.getUsername())
-                .password(passwordEncoder.encode(userDto.getPassword()))
-                .nickname(userDto.getNickname())
+        Member member = Member.builder()
+                .username(memberDto.getUsername())
+                .password(passwordEncoder.encode(memberDto.getPassword()))
+                .nickname(memberDto.getNickname())
+                .tel(memberDto.getTel())
                 .role(role)
                 .build();
-        userRepository.save(user);
+        memberRepository.save(member);
 
-        createToken(userDto.getUsername(), userDto.getPassword());
+        createToken(memberDto.getUsername(), memberDto.getPassword());
 
-        return user;
+        return member.getUsername();
     }
 
-    public UserDto findUser(String username) {
-        Optional<User> findUser = userRepository.findByUsername(username);
+    public MemberDto findUser(String username) {
+        Optional<Member> findUser = memberRepository.findByUsername(username);
 
-        return UserDto.builder()
+        return MemberDto.builder()
                 .username(findUser.get().getUsername())
                 .nickname(findUser.get().getNickname())
+                .tel(findUser.get().getTel())
                 .role(findUser.get().getRole())
                 .build();
     }
