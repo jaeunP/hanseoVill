@@ -10,6 +10,7 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
+@Table(name = "owner")
 @Getter
 @NoArgsConstructor
 public class Owner {
@@ -19,7 +20,7 @@ public class Owner {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long ownerId;
 
-    @Column(name = "owner_name", length = 50, unique = true)
+    @Column(name = "username", length = 50, unique = true)
     private String username;
 
     @JsonIgnore
