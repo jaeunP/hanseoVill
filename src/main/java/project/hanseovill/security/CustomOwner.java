@@ -1,38 +1,30 @@
 package project.hanseovill.security;
 
-
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import project.hanseovill.domain.Owner;
 import project.hanseovill.domain.Role;
-import project.hanseovill.domain.Member;
 
 import java.util.ArrayList;
-
 import java.util.Collection;
 
+public class CustomOwner implements UserDetails {
 
+    private final Owner owner;
 
-public class UserDetailsImpl implements UserDetails {
-
-    private final Member member;
-
-    public UserDetailsImpl(Member member) {
-        this.member = member;
-    }
-
-    public Member getUser() {
-        return member;
+    public CustomOwner(Owner owner) {
+        this.owner = owner;
     }
 
     @Override
     public String getPassword() {
-        return member.getPassword();
+        return owner.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return member.getUsername();
+        return owner.getUsername();
     }
 
     @Override
@@ -57,7 +49,7 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        Role userRole = member.getRole();
+        Role userRole = owner.getRole();
 
         SimpleGrantedAuthority authority = new SimpleGrantedAuthority(userRole.toString());
         Collection<GrantedAuthority> authorities = new ArrayList<>();

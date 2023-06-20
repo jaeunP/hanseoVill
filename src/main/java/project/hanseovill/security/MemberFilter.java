@@ -5,8 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -22,10 +22,10 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Component
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+public class MemberFilter extends OncePerRequestFilter {
 
     private final MemberRepository memberRepository;
-    private final UserDetailsService userDetailsService;
+    private final CustomMemberService userDetailsService;
     private final JwtTokenUtil jwtTokenUtil;
 
     String HEADER_STRING = "Authorization";
@@ -64,7 +64,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         chain.doFilter(request, res);
     }
-
-
-
 }
